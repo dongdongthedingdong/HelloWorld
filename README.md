@@ -4,7 +4,11 @@ This is our first repository in Advanced AUtomation at SSIS in 2022-2023
 
 ## Python
 
-This is the code.
+This is the code. You can mask code with ''these symbols''.
+
+'''
+print("Hello World!")
+'''
 
 ## Java Script
 
