@@ -4,11 +4,15 @@ This is our first repository in Advanced AUtomation at SSIS in 2022-2023
 
 ## Python
 
-This is the code. You can mask code with ''these symbols''.
+This is the code. You can highlight "code" elements with two symbols, and mask it like "this example" in line. Or you make a code block:
 
 '''
+def greeting():
+  print("This is my greeting!")
+  
 print("Hello World!")
 '''
+
 
 ## Java Script
 
