@@ -1,0 +1,71 @@
+input.onButtonPressed(Button.A, function () {
+    Hero.move(-1)
+})
+function spawnCarbonDioxide () {
+    while (game.score() == 0) {
+        Carbon_Dioxide = game.createSprite(randint(0, 4), 4)
+        Carbon_Dioxide.set(LedSpriteProperty.Brightness, 150)
+        basic.pause(100)
+        Carbon_Dioxide.turn(Direction.Right, 270)
+        for (let index = 0; index < 4; index++) {
+            Carbon_Dioxide.move(1)
+            basic.pause(500)
+            if (Carbon_Dioxide.isTouching(Hero)) {
+                game.gameOver()
+            }
+        }
+        if (Carbon_Dioxide.isTouchingEdge()) {
+            Carbon_Dioxide.delete()
+        }
+    }
+    if (game.score() >= 1) {
+        basic.pause(5000)
+        representNewRound()
+        while (game.isRunning()) {
+            Carbon_Dioxide = game.createSprite(randint(0, 4), 4)
+            Carbon_Dioxide.set(LedSpriteProperty.Brightness, 150)
+            basic.pause(100)
+            Carbon_Dioxide.turn(Direction.Right, 270)
+            for (let index = 0; index < 4; index++) {
+                Carbon_Dioxide.move(2)
+                basic.pause(500)
+                if (Carbon_Dioxide.isTouching(Hero)) {
+                    game.gameOver()
+                }
+            }
+            if (Carbon_Dioxide.isTouchingEdge()) {
+                Carbon_Dioxide.delete()
+            }
+        }
+    }
+}
+input.onButtonPressed(Button.AB, function () {
+    Containment = game.createSprite(Hero.get(LedSpriteProperty.X), Hero.get(LedSpriteProperty.Y))
+    Containment.change(LedSpriteProperty.Brightness, 80)
+    for (let index = 0; index < 4; index++) {
+        Containment.change(LedSpriteProperty.Y, 1)
+        basic.pause(100)
+        if (Containment.isTouching(Carbon_Dioxide)) {
+            game.addScore(1)
+            Carbon_Dioxide.delete()
+            Containment.delete()
+        }
+    }
+    if (Containment.get(LedSpriteProperty.Y) >= 4) {
+        Containment.delete()
+    }
+})
+input.onButtonPressed(Button.B, function () {
+    Hero.move(1)
+})
+input.onGesture(Gesture.Shake, function () {
+    spawnCarbonDioxide()
+})
+function representNewRound () {
+    basic.showString("New Round")
+}
+let Containment: game.LedSprite = null
+let Carbon_Dioxide: game.LedSprite = null
+let Hero: game.LedSprite = null
+Hero = game.createSprite(2, 0)
+game.setScore(0)
