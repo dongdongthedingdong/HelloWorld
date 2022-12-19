@@ -1,0 +1,100 @@
+function readTime () {
+    anotherAnalogValue1 = pins.analogReadPin(AnalogPin.P1)
+    return Math.map(anotherAnalogValue1, 0, 1023, 0, 250)
+}
+function readTemperature () {
+    analogValue = pins.analogReadPin(AnalogPin.P0)
+    return Math.map(analogValue, 0, 1023, -10, 80)
+}
+function show_blue () {
+    strip.showColor(neopixel.rgb(0, 0, 255))
+    strip.show()
+}
+input.onButtonPressed(Button.A, function () {
+    anotherAnalogValue = analogValue * anotherAnalogValue1
+    pins.analogWritePin(AnalogPin.P2, anotherAnalogValue)
+    strip.clear()
+    strip.show()
+})
+function updateSystem () {
+    temperature = readTemperature()
+    time = readTime()
+    appliedTemperature = temperature * time
+    serial.writeLine("" + (temperature))
+    serial.writeLine("" + (time))
+    serial.writeLine("" + (appliedTemperature))
+}
+function show_green () {
+    strip.showColor(neopixel.rgb(0, 255, 0))
+    strip.show()
+}
+function show_red () {
+    strip.showColor(neopixel.rgb(255, 0, 0))
+    strip.show()
+}
+input.onButtonPressed(Button.AB, function () {
+    pins.analogWritePin(AnalogPin.P0, 0)
+    pins.analogWritePin(AnalogPin.P1, 0)
+    anotherAnalogValue = 0
+    pins.analogWritePin(AnalogPin.P2, 0)
+    basic.clearScreen()
+})
+input.onButtonPressed(Button.B, function () {
+    loops.everyInterval(1000, function () {
+        pins.analogWritePin(AnalogPin.P2, anotherAnalogValue += -analogValue)
+    }
+    )
+})
+
+function reactToState (state: number) {
+    if (state == TOO_COLD) {
+        show_blue()
+    } else if (state == TOO_HOT) {
+        show_red()
+    } else {
+        show_green()
+    }
+}
+function Done () {
+    if (anotherAnalogValue < 0) {
+        basic.showLeds(`
+            . # # . .
+            . # . # .
+            . # . . #
+            . # . # .
+            . # # . .
+            `)
+    }
+    serial.writeLine("Done")
+}
+function evaluateState (state2: number) {
+    if (appliedTemperature > 2000 && appliedTemperature <= 2200) {
+        return IN_RANGE
+    } else if (appliedTemperature <= 2000) {
+        return TOO_COLD
+    } else if (appliedTemperature > 2200) {
+        return TOO_HOT
+    } else {
+        return state2
+    }
+}
+let TOO_COLD = 0
+let appliedTemperature = 0
+let time = 0
+let temperature = 0
+let anotherAnalogValue1 = 0
+let strip: neopixel.Strip = null
+let IN_RANGE = 0
+let TOO_HOT = 0
+let analogValue = 0
+let anotherAnalogValue = 0
+TOO_HOT = 1
+IN_RANGE = 2
+let state3 = IN_RANGE
+strip = neopixel.create(DigitalPin.P4, 8, NeoPixelMode.RGB)
+basic.forever(function () {
+    updateSystem()
+    state3 = evaluateState(state3)
+    reactToState(state3)
+    Done()
+})
